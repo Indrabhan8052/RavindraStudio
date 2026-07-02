@@ -1,0 +1,71 @@
+<% const pageTitle = 'Order Confirmed!' %>
+<div style="max-width:720px; margin:0 auto; padding:64px 24px 80px; text-align:center;">
+    <div style="width:80px; height:80px; border-radius:50%; background:var(--color-success-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; color:var(--color-success);">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h1 style="font-size:2.2rem; margin-bottom:10px;">Order Confirmed!</h1>
+    <p style="color:var(--color-ink-soft); font-size:1.05rem; margin-bottom:32px;">
+        Thank you for your order. Your frames are on their way soon!
+    </p>
+
+    <div style="background:var(--color-card); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:28px; text-align:left; margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--color-border);">
+            <div>
+                <span style="font-family:var(--font-mono); font-size:0.78rem; color:var(--color-ink-soft);">Order Number</span>
+                <div style="font-family:var(--font-mono); font-size:1.2rem; font-weight:700; margin-top:2px;"><%= order.order_number %></div>
+            </div>
+            <span class="status-pill status-placed">Order Placed</span>
+        </div>
+
+        <% items.forEach(item => { %>
+            <div style="display:flex; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid var(--color-border);">
+                <div style="width:56px; height:56px; background:var(--color-bg-alt); padding:6px; flex-shrink:0;">
+                    <img src="<%= item.product_image || '/images/placeholder-frame.svg' %>" alt="<%= item.product_name %>" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <div style="flex:1;">
+                    <div style="font-weight:600; font-size:0.92rem;"><%= item.product_name %></div>
+                    <div style="font-size:0.8rem; color:var(--color-ink-soft);">Qty: <%= item.quantity %></div>
+                </div>
+                <div style="font-family:var(--font-mono); font-weight:600;">₹<%= Number(item.line_total).toLocaleString('en-IN') %></div>
+            </div>
+        <% }) %>
+
+        <div style="margin-top:16px;">
+            <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:0.9rem; color:var(--color-ink-soft);">
+                <span>Payment Method</span>
+                <span style="font-weight:600; color:var(--color-ink);"><%= order.payment_method === 'COD' ? 'Cash on Delivery' : 'UPI' %></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:12px 0; font-size:1.1rem; font-weight:700; border-top:1.5px solid var(--color-border); margin-top:8px;">
+                <span>Total</span>
+                <span style="font-family:var(--font-mono);">₹<%= Number(order.total_amount).toLocaleString('en-IN') %></span>
+            </div>
+        </div>
+    </div>
+
+    <% if (order.payment_method === 'UPI') { %>
+        <div style="background:#FFF9E6; border:1.5px solid #f0dca0; border-radius:var(--radius-lg); padding:20px 24px; text-align:left; margin-bottom:24px; display:flex; gap:14px; align-items:flex-start;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="color:#8B6800; flex-shrink:0; margin-top:2px;"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+                <p style="color:#8B6800; font-weight:600; font-size:0.9rem; margin-bottom:4px;">One more step — complete your payment</p>
+                <p style="color:#8B6800; font-size:0.85rem;">Please pay via UPI and upload your payment screenshot on the order tracking page so we can verify and confirm your order.</p>
+            </div>
+        </div>
+    <% } %>
+
+    <% if (address) { %>
+        <div style="background:var(--color-card); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:20px; text-align:left; margin-bottom:32px;">
+            <h4 style="margin-bottom:8px; font-size:0.88rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--color-ink-soft);">Delivering To</h4>
+            <div style="font-weight:600;"><%= address.full_name %></div>
+            <div style="font-size:0.9rem; color:var(--color-ink-soft); margin-top:4px;">
+                <%= address.address_line1 %><%= address.address_line2 ? ', ' + address.address_line2 : '' %>,<br>
+                <%= address.city %>, <%= address.state %> — <%= address.pincode %><br>
+                Phone: <%= address.phone %>
+            </div>
+        </div>
+    <% } %>
+
+    <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <a href="/orders/<%= order.id %>" class="btn btn--primary"><%= order.payment_method === 'UPI' ? 'Complete Payment →' : 'Track Order' %></a>
+        <a href="/products" class="btn btn--secondary">Continue Shopping</a>
+    </div>
+</div>

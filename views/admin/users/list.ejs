@@ -1,0 +1,53 @@
+<% pageTitle = 'Customers'; layout = 'admin/layout' %>
+
+<div class="admin-card">
+    <div class="admin-card__head">
+        <form action="/admin/users" method="GET" class="admin-search">
+            <input type="text" name="search" placeholder="Search by name or email…" value="<%= search %>">
+            <button type="submit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        </form>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr><th>User</th><th>Phone</th><th>Role</th><th>Joined</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <% if (users.length === 0) { %>
+                <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--admin-ink-soft);">No users found.</td></tr>
+            <% } else { %>
+                <% users.forEach(u => { %>
+                    <tr>
+                        <td>
+                            <div style="font-weight:600; font-size:0.9rem;"><%= u.full_name %></div>
+                            <div style="font-size:0.78rem; color:var(--admin-ink-soft);"><%= u.email %></div>
+                        </td>
+                        <td class="mono" style="font-size:0.85rem;"><%= u.phone %></td>
+                        <td><span class="status-pill status-<%= u.role %>"><%= u.role %></span></td>
+                        <td style="font-size:0.82rem; color:var(--admin-ink-soft);"><%= new Date(u.created_at).toLocaleDateString('en-IN') %></td>
+                        <td><span class="status-pill status-<%= u.is_active ? 'active' : 'inactive' %>"><%= u.is_active ? 'Active' : 'Inactive' %></span></td>
+                        <td>
+                            <% if (u.role !== 'admin') { %>
+                                <form action="/admin/users/<%= u.id %>/toggle-active" method="POST">
+                                    <button type="submit" class="abtn abtn-<%= u.is_active ? '-danger' : '-success' %> abtn--small" style="color:<%= u.is_active ? 'var(--admin-error)' : 'var(--admin-success)' %>; border-color:currentColor; background:transparent; padding:5px 11px; border-radius:7px; border:1.5px solid; font-size:0.76rem; font-weight:600;">
+                                        <%= u.is_active ? 'Deactivate' : 'Activate' %>
+                                    </button>
+                                </form>
+                            <% } else { %>
+                                <span style="font-size:0.78rem; color:var(--admin-ink-soft);">Admin</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+
+    <% if (totalPages > 1) { %>
+        <div class="admin-pagination">
+            <% for (let p = 1; p <= totalPages; p++) { %>
+                <a href="/admin/users?page=<%= p %>&search=<%= search %>" class="<%= p === currentPage ? 'is-active' : '' %>"><%= p %></a>
+            <% } %>
+        </div>
+    <% } %>
+</div>

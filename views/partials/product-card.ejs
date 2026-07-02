@@ -1,0 +1,40 @@
+<%
+/* Expects local: product (with primary_image, icon_shape/category_slug, price, discount_price, etc.) */
+const hasDiscount = product.discount_price && Number(product.discount_price) < Number(product.price);
+const offPercent = hasDiscount ? Math.round(100 - (product.discount_price / product.price) * 100) : 0;
+%>
+<div class="product-card">
+    <div class="product-card__media">
+        <% if (hasDiscount) { %><span class="product-card__badge"><%= offPercent %>% OFF</span><% } %>
+        <% if (currentUser && currentUser.role === 'customer') { %>
+            <form action="/wishlist/toggle" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="product_id" value="<%= product.id %>">
+                <input type="hidden" name="redirectTo" value="<%= currentPath || '/' %>">
+                <button type="submit" class="product-card__wishlist" aria-label="Toggle wishlist">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.873-10-9.5C0.5 7.5 2.5 3 7 3c2.5 0 4 1.5 5 3 1-1.5 2.5-3 5-3 4.5 0 6.5 4.5 5 8.5C19.5 16.127 12 21 12 21z" opacity="0.15" stroke="currentColor" stroke-width="2"/></svg>
+                </button>
+            </form>
+        <% } %>
+        <a href="/products/<%= product.slug %>">
+            <%- include('./shape-image', { shape: product.icon_shape || 'square', imageUrl: product.primary_image, alt: product.name }) %>
+        </a>
+    </div>
+    <div class="product-card__body">
+        <span class="product-card__category"><%= product.category_name || '' %></span>
+        <h3 class="product-card__title"><a href="/products/<%= product.slug %>"><%= product.name %></a></h3>
+        <div class="product-card__rating">
+            <span class="stars">★★★★★</span>
+            <span><%= product.rating_avg > 0 ? product.rating_avg : 'New' %> <% if (product.rating_count > 0) { %>(<%= product.rating_count %>)<% } %></span>
+        </div>
+        <div class="product-card__price">
+            <span class="current">₹<%= Number(hasDiscount ? product.discount_price : product.price).toLocaleString('en-IN') %></span>
+            <% if (hasDiscount) { %><span class="original">₹<%= Number(product.price).toLocaleString('en-IN') %></span><% } %>
+        </div>
+        <% if (product.stock_quantity <= 5 && product.stock_quantity > 0) { %>
+            <div class="product-card__stock">Only <%= product.stock_quantity %> left!</div>
+        <% } else if (product.stock_quantity === 0) { %>
+            <div class="product-card__stock">Out of stock</div>
+        <% } %>
+    </div>
+</div>

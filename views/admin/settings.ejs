@@ -1,0 +1,80 @@
+<% pageTitle = 'Settings'; layout = 'admin/layout' %>
+
+<div style="max-width:640px;">
+    <form action="/admin/settings" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="admin-form-section">
+            <h3>Store Information</h3>
+            <div class="aform-group">
+                <label>Store Name</label>
+                <input type="text" name="site_name" value="<%= settings.site_name || 'FrameKraft' %>">
+            </div>
+            <div class="aform-group">
+                <label>Tagline</label>
+                <input type="text" name="site_tagline" value="<%= settings.site_tagline || '' %>">
+            </div>
+            <div class="aform-row">
+                <div class="aform-group">
+                    <label>Contact Email</label>
+                    <input type="email" name="contact_email" value="<%= settings.contact_email || '' %>">
+                </div>
+                <div class="aform-group">
+                    <label>Contact Phone</label>
+                    <input type="text" name="contact_phone" value="<%= settings.contact_phone || '' %>">
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Shipping</h3>
+            <div class="aform-row">
+                <div class="aform-group">
+                    <label>Shipping Fee (₹)</label>
+                    <input type="number" name="shipping_fee" value="<%= settings.shipping_fee || 49 %>" min="0">
+                </div>
+                <div class="aform-group">
+                    <label>Free Shipping Above (₹)</label>
+                    <input type="number" name="free_shipping_above" value="<%= settings.free_shipping_above || 999 %>" min="0">
+                    <span class="ahint">Orders above this amount get free shipping.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>UPI / QR Code Payments</h3>
+            <p style="font-size:0.85rem; color:var(--admin-ink-soft); margin-bottom:18px;">
+                Set up your UPI ID and QR code here. Customers will see this at checkout when they choose "UPI / QR Code Payment", and will be asked to upload a screenshot afterward for you to verify under <strong>Verify Payments</strong>.
+            </p>
+
+            <div class="aform-row">
+                <div class="aform-group">
+                    <label>Your UPI ID *</label>
+                    <input type="text" name="upi_id" value="<%= settings.upi_id || '' %>" placeholder="e.g. yourname@okhdfcbank" style="font-family:var(--font-mono);">
+                    <span class="ahint">Customers will pay directly to this UPI ID.</span>
+                </div>
+                <div class="aform-group">
+                    <label>Payee Name (shown to customer)</label>
+                    <input type="text" name="upi_payee_name" value="<%= settings.upi_payee_name || '' %>" placeholder="e.g. FrameKraft Store">
+                </div>
+            </div>
+
+            <div class="aform-group">
+                <label>UPI QR Code Image</label>
+                <% if (settings.upi_qr_image) { %>
+                    <div style="margin-bottom:12px;">
+                        <img src="<%= settings.upi_qr_image %>" alt="Current UPI QR" style="width:140px; height:140px; object-fit:contain; background:#fff; padding:8px; border-radius:8px; border:1.5px solid var(--admin-border);">
+                        <p style="font-size:0.75rem; color:var(--admin-ink-soft); margin-top:6px;">Current QR code — upload a new image below to replace it.</p>
+                    </div>
+                <% } %>
+                <label class="image-upload-area" for="upi_qr_upload" style="display:block;">
+                    <input type="file" id="upi_qr_upload" name="upi_qr_upload" accept="image/*">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" style="color:var(--admin-ink-soft); margin:0 auto 8px;"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.5"/></svg>
+                    <p style="font-size:0.82rem; color:var(--admin-ink-soft);">Click to upload your UPI QR code image</p>
+                    <p style="font-size:0.72rem; color:var(--admin-ink-soft); margin-top:4px;">Generate this from your UPI app (Google Pay / PhonePe / Paytm) → "Show QR Code" → save the image, then upload here.</p>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="abtn abtn--primary">Save Settings</button>
+    </form>
+</div>

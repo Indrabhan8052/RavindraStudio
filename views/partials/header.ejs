@@ -1,0 +1,87 @@
+<header class="site-header">
+    <div class="site-header__top">
+        <div class="container site-header__top-inner">
+            <p>Free shipping on orders over ₹999 · Cash on Delivery available in Lucknow</p>
+        </div>
+    </div>
+
+    <div class="container site-header__main">
+        <a href="/" class="brand">
+            <svg class="brand__mark" width="34" height="34" viewBox="0 0 34 34" fill="none">
+                <rect x="3" y="3" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2.5"/>
+                <circle cx="26" cy="26" r="6.5" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+            <span class="brand__text">
+    <img src="/images/logo.jpg" alt="RavindraStudio" style="height: 60px; width: auto; vertical-align: middle; margin-right: 8px;">
+</span>
+        </a>
+        <div class="search-wrapper" id="searchWrapper">
+            <form action="/search" method="GET" class="header-search" id="searchForm" autocomplete="off">
+                <input
+                    type="text"
+                    name="q"
+                    id="searchInput"
+                    placeholder="Search square, circle, heart frames…"
+                    value="<%= typeof query !== 'undefined' && query.search ? query.search : (typeof q !== 'undefined' ? q : '') %>"
+                    aria-label="Search frames"
+                    aria-autocomplete="list"
+                    aria-controls="autocompleteDropdown"
+                    aria-expanded="false"
+                >
+                <button type="submit" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+            </form>
+            <div id="autocompleteDropdown" class="autocomplete-dropdown" role="listbox"></div>
+        </div>
+
+        <nav class="header-actions">
+            <% if (currentUser && currentUser.role === 'customer') { %>
+                <a href="/wishlist" class="header-action" title="Wishlist">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.873-10-9.5C0.5 7.5 2.5 3 7 3c2.5 0 4 1.5 5 3 1-1.5 2.5-3 5-3 4.5 0 6.5 4.5 5 8.5C19.5 16.127 12 21 12 21z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                    <span>Wishlist</span>
+                </a>
+                <a href="/cart" class="header-action header-action--cart" title="Cart">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.4a2 2 0 002 1.6h8.4a2 2 0 002-1.6L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="21" r="1.3" fill="currentColor"/><circle cx="18" cy="21" r="1.3" fill="currentColor"/></svg>
+                    <span>Cart</span>
+                    <% if (cartCount > 0) { %><span class="cart-badge"><%= cartCount %></span><% } %>
+                </a>
+                <div class="header-action header-action--profile">
+                    <a href="/profile" title="My Account">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        <span><%= currentUser.full_name.split(' ')[0] %></span>
+                    </a>
+                    <div class="profile-dropdown">
+                        <a href="/profile">My Profile</a>
+                        <a href="/orders">My Orders</a>
+                        <a href="/wishlist">Wishlist</a>
+                        <form action="/logout" method="POST">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit">Log Out</button>
+                        </form>
+                    </div>
+                </div>
+            <% } else { %>
+                <a href="/login" class="header-action">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span>Login</span>
+                </a>
+                <a href="/register" class="btn btn--small btn--primary">Sign Up</a>
+            <% } %>
+        </nav>
+    </div>
+
+    <nav class="site-nav">
+        <div class="container site-nav__inner">
+            <a href="/products" class="<%= currentPath === '/products' ? 'is-active' : '' %>">All Frames</a>
+            <a href="/products?category=square-frames">Square</a>
+            <a href="/products?category=circle-frames">Circle</a>
+            <a href="/products?category=heart-frames">Heart</a>
+            <a href="/products?category=oval-frames">Oval</a>
+            <a href="/products?category=collage-frames">Collage</a>
+            <a href="/products?category=hexagon-frames">Hexagon</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </div>
+    </nav>
+</header>

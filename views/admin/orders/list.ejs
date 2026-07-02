@@ -1,0 +1,55 @@
+<% pageTitle = 'Orders'; layout = 'admin/layout' %>
+
+<div class="admin-card">
+    <div class="admin-card__head">
+        <div class="admin-toolbar">
+            <form action="/admin/orders" method="GET" class="admin-search">
+                <input type="text" name="search" placeholder="Order number, customer…" value="<%= search %>">
+                <button type="submit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+            </form>
+            <form action="/admin/orders" method="GET">
+                <select name="status" onchange="this.form.submit()" style="padding:9px 12px; border:1.5px solid var(--admin-border); border-radius:7px; font-size:0.85rem; background:var(--admin-card-bg);">
+                    <option value="">All Statuses</option>
+                    <% ['placed','confirmed','packed','shipped','delivered','cancelled'].forEach(s => { %>
+                        <option value="<%= s %>" <%= statusFilter === s ? 'selected' : '' %>><%= s.charAt(0).toUpperCase() + s.slice(1) %></option>
+                    <% }) %>
+                </select>
+            </form>
+        </div>
+        <span style="font-size:0.82rem; color:var(--admin-ink-soft);"><%= totalCount %> orders</span>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr><th>Order #</th><th>Customer</th><th>Date</th><th>Amount</th><th>Payment</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            <% if (orders.length === 0) { %>
+                <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--admin-ink-soft);">No orders found.</td></tr>
+            <% } else { %>
+                <% orders.forEach(order => { %>
+                    <tr>
+                        <td><a href="/admin/orders/<%= order.id %>" class="mono" style="color:var(--admin-terracotta); font-weight:600;">#<%= order.order_number %></a></td>
+                        <td>
+                            <div style="font-weight:500; font-size:0.88rem;"><%= order.customer_name %></div>
+                            <div style="font-size:0.75rem; color:var(--admin-ink-soft);"><%= order.customer_email %></div>
+                        </td>
+                        <td style="font-size:0.82rem; color:var(--admin-ink-soft);"><%= new Date(order.created_at).toLocaleDateString('en-IN') %></td>
+                        <td class="mono">₹<%= Number(order.total_amount).toLocaleString('en-IN') %></td>
+                        <td><span class="status-pill status-<%= order.payment_status %>"><%= order.payment_method %> · <%= order.payment_status === 'submitted' ? 'Under Review' : order.payment_status %></span></td>
+                        <td><span class="status-pill status-<%= order.order_status %>"><%= order.order_status %></span></td>
+                        <td><a href="/admin/orders/<%= order.id %>" class="abtn abtn--secondary abtn--small">View</a></td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+
+    <% if (totalPages > 1) { %>
+        <div class="admin-pagination">
+            <% for (let p = 1; p <= totalPages; p++) { %>
+                <a href="/admin/orders?page=<%= p %>&status=<%= statusFilter %>&search=<%= search %>" class="<%= p === currentPage ? 'is-active' : '' %>"><%= p %></a>
+            <% } %>
+        </div>
+    <% } %>
+</div>

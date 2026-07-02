@@ -1,0 +1,28 @@
+<% pageTitle = 'Reviews'; layout = 'admin/layout' %>
+
+<div class="admin-card">
+    <div class="admin-card__head"><h3>Product Reviews</h3></div>
+    <table class="data-table">
+        <thead><tr><th>Product</th><th>Customer</th><th>Rating</th><th>Review</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody>
+            <% if (reviews.length === 0) { %>
+                <tr><td colspan="6" style="text-align:center; padding:36px; color:var(--admin-ink-soft);">No reviews yet.</td></tr>
+            <% } else { %>
+                <% reviews.forEach(r => { %>
+                    <tr>
+                        <td style="font-size:0.85rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><a href="/products/<%= r.product_slug %>" target="_blank" style="color:var(--admin-terracotta);"><%= r.product_name %></a></td>
+                        <td style="font-size:0.85rem;"><%= r.full_name %></td>
+                        <td><span style="color:var(--admin-gold); font-size:1rem;"><%= '★'.repeat(r.rating) %><%= '☆'.repeat(5-r.rating) %></span></td>
+                        <td style="font-size:0.82rem; color:var(--admin-ink-soft); max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= r.comment || '—' %></td>
+                        <td style="font-size:0.78rem; color:var(--admin-ink-soft);"><%= new Date(r.created_at).toLocaleDateString('en-IN') %></td>
+                        <td>
+                            <form action="/admin/reviews/<%= r.id %>/delete" method="POST" data-confirm="Delete this review?">
+                                <button type="submit" class="abtn abtn--danger abtn--small">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+</div>

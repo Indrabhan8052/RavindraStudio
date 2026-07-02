@@ -1,0 +1,81 @@
+<% pageTitle = 'Coupons'; layout = 'admin/layout' %>
+
+<div style="display:grid; grid-template-columns:1fr 360px; gap:24px; align-items:start;">
+    <!-- Coupons Table -->
+    <div class="admin-card">
+        <div class="admin-card__head"><h3>Discount Coupons</h3></div>
+        <table class="data-table">
+            <thead>
+                <tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Used / Max</th><th>Expires</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                <% if (coupons.length === 0) { %>
+                    <tr><td colspan="8" style="text-align:center; padding:32px; color:var(--admin-ink-soft);">No coupons yet. Create one →</td></tr>
+                <% } else { %>
+                    <% coupons.forEach(c => { %>
+                        <tr>
+                            <td class="mono" style="font-weight:700; color:var(--admin-terracotta);"><%= c.code %></td>
+                            <td style="font-size:0.82rem;"><%= c.discount_type === 'percent' ? 'Percent' : 'Flat' %></td>
+                            <td class="mono"><%= c.discount_type === 'percent' ? c.discount_value + '%' : '₹' + c.discount_value %></td>
+                            <td class="mono">₹<%= Number(c.min_order_amount).toLocaleString('en-IN') %></td>
+                            <td class="mono"><%= c.used_count %> / <%= c.max_uses || '∞' %></td>
+                            <td style="font-size:0.82rem; color:var(--admin-ink-soft);"><%= c.expires_at ? new Date(c.expires_at).toLocaleDateString('en-IN') : '—' %></td>
+                            <td>
+                                <form action="/admin/coupons/<%= c.id %>/toggle-active" method="POST" style="display:inline;">
+                                    <button type="submit" class="status-pill status-<%= c.is_active ? 'active' : 'inactive' %>" style="border:none; cursor:pointer;"><%= c.is_active ? 'Active' : 'Off' %></button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="/admin/coupons/<%= c.id %>/delete" method="POST" data-confirm="Delete coupon '<%= c.code %>'?">
+                                    <button type="submit" class="abtn abtn--danger abtn--small">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Create Coupon Form -->
+    <div class="admin-card">
+        <div class="admin-card__head"><h3>Create Coupon</h3></div>
+        <div class="admin-card__body">
+            <form action="/admin/coupons/new" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="aform-group">
+                    <label>Coupon Code *</label>
+                    <input type="text" name="code" placeholder="e.g. SAVE20" required style="text-transform:uppercase; font-family:var(--font-mono);">
+                </div>
+                <div class="aform-row">
+                    <div class="aform-group">
+                        <label>Discount Type</label>
+                        <select name="discount_type">
+                            <option value="percent">Percentage (%)</option>
+                            <option value="flat">Flat Amount (₹)</option>
+                        </select>
+                    </div>
+                    <div class="aform-group">
+                        <label>Value *</label>
+                        <input type="number" name="discount_value" placeholder="e.g. 20" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="aform-group">
+                    <label>Min Order Amount (₹)</label>
+                    <input type="number" name="min_order_amount" placeholder="0" step="0.01" min="0">
+                </div>
+                <div class="aform-row">
+                    <div class="aform-group">
+                        <label>Max Uses</label>
+                        <input type="number" name="max_uses" placeholder="Leave blank = unlimited" min="1">
+                    </div>
+                    <div class="aform-group">
+                        <label>Expires On</label>
+                        <input type="date" name="expires_at">
+                    </div>
+                </div>
+                <button type="submit" class="abtn abtn--primary" style="width:100%;">Create Coupon</button>
+            </form>
+        </div>
+    </div>
+</div>

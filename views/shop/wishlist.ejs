@@ -1,0 +1,46 @@
+<% const pageTitle = 'My Wishlist' %>
+<div style="max-width:var(--container-width); margin:0 auto; padding:48px 24px 80px;">
+    <h1 style="font-size:2rem; margin-bottom:32px;">My Wishlist</h1>
+
+    <% if (items.length === 0) { %>
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.873-10-9.5C0.5 7.5 2.5 3 7 3c2.5 0 4 1.5 5 3 1-1.5 2.5-3 5-3 4.5 0 6.5 4.5 5 8.5C19.5 16.127 12 21 12 21z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <h3>Your wishlist is empty</h3>
+            <p>Save frames you love while you browse. They'll be waiting here.</p>
+            <br><a href="/products" class="btn btn--primary">Browse Frames</a>
+        </div>
+    <% } else { %>
+        <div class="product-grid">
+            <% items.forEach(item => { %>
+                <div class="product-card">
+                    <div class="product-card__media">
+                        <a href="/products/<%= item.slug %>">
+                            <%- include('../partials/shape-image', { shape: 'square', imageUrl: item.primary_image, alt: item.name }) %>
+                        </a>
+                        <form action="/wishlist/remove/<%= item.product_id %>" method="POST">
+                            <button type="submit" class="product-card__wishlist is-active" title="Remove from wishlist">♥</button>
+                        </form>
+                    </div>
+                    <div class="product-card__body">
+                        <h3 class="product-card__title"><a href="/products/<%= item.slug %>"><%= item.name %></a></h3>
+                        <div class="product-card__price">
+                            <span class="current">₹<%= Number(item.discount_price || item.price).toLocaleString('en-IN') %></span>
+                            <% if (item.discount_price) { %><span class="original">₹<%= Number(item.price).toLocaleString('en-IN') %></span><% } %>
+                        </div>
+                        <% if (item.stock_quantity === 0) { %>
+                            <div class="product-card__stock">Out of stock</div>
+                        <% } %>
+                        <div class="product-card__actions" style="margin-top:14px;">
+                            <form action="/cart/add" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <input type="hidden" name="product_id" value="<%= item.product_id %>">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn--primary btn--small btn--full" <%= item.stock_quantity === 0 ? 'disabled' : '' %>>Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    <% } %>
+</div>

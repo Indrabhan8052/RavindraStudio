@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — Admin | FrameKraft' : 'Admin Panel | FrameKraft' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
+    <meta name="csrf-token" content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+    <script>window.CSRF_TOKEN = '<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>';</script>
+</head>
+<body>
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="admin-sidebar__brand">
+            <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+                <rect x="3" y="3" width="20" height="20" rx="2" stroke="currentColor" stroke-width="2.5"/>
+                <circle cx="26" cy="26" r="6.5" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+            <div>
+                <span>FrameKraft</span>
+                <small>Admin Panel</small>
+            </div>
+        </div>
+
+        <nav class="admin-nav">
+            <div class="admin-nav__section">
+                <div class="admin-nav__label">Overview</div>
+                <a href="/admin/dashboard" class="<%= currentPath === '/admin/dashboard' ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+                    Dashboard
+                </a>
+            </div>
+            <div class="admin-nav__section">
+                <div class="admin-nav__label">Catalog</div>
+                <a href="/admin/products" class="<%= currentPath.startsWith('/admin/products') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M3 16c0-1.1.9-2 2-2h14a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3z" stroke="currentColor" stroke-width="2"/></svg>
+                    Products
+                </a>
+                <a href="/admin/categories" class="<%= currentPath.startsWith('/admin/categories') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Categories
+                </a>
+            </div>
+            <div class="admin-nav__section">
+                <div class="admin-nav__label">Store</div>
+                <a href="/admin/orders" class="<%= currentPath === '/admin/orders' ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9 9h6M9 13h6M9 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Orders
+                </a>
+                <a href="/admin/orders/verify-payments" class="<%= currentPath === '/admin/orders/verify-payments' ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Verify Payments
+                    <% if (typeof pendingVerificationCount !== 'undefined' && pendingVerificationCount > 0) { %>
+                        <span class="badge"><%= pendingVerificationCount %></span>
+                    <% } %>
+                </a>
+                <a href="/admin/users" class="<%= currentPath.startsWith('/admin/users') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M2 20c0-4 3.1-7 7-7s7 3 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="7" r="3" stroke="currentColor" stroke-width="2"/><path d="M22 20c0-3-1.7-5-4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Customers
+                </a>
+                <a href="/admin/coupons" class="<%= currentPath.startsWith('/admin/coupons') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M9 3H4a1 1 0 00-1 1v5l11 11 6-6L9 3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="6.5" cy="6.5" r="1" fill="currentColor"/></svg>
+                    Coupons
+                </a>
+                <a href="/admin/reviews" class="<%= currentPath.startsWith('/admin/reviews') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                    Reviews
+                </a>
+            </div>
+            <div class="admin-nav__section">
+                <div class="admin-nav__label">Support</div>
+                <a href="/admin/messages" class="<%= currentPath.startsWith('/admin/messages') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+                    Messages
+                    <% if (typeof unreadMessages !== 'undefined' && unreadMessages > 0) { %>
+                        <span class="badge"><%= unreadMessages %></span>
+                    <% } %>
+                </a>
+                <a href="/admin/settings" class="<%= currentPath.startsWith('/admin/settings') ? 'is-active' : '' %>">
+                    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="2"/></svg>
+                    Settings
+                </a>
+            </div>
+        </nav>
+
+        <div class="admin-sidebar__footer">
+            <div class="user-info">
+                <div class="avatar"><%= currentUser ? currentUser.full_name.charAt(0).toUpperCase() : 'A' %></div>
+                <div>
+                    <div class="user-name"><%= currentUser ? currentUser.full_name : 'Admin' %></div>
+                    <div class="user-role">Administrator</div>
+                </div>
+            </div>
+            <form action="/logout" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button type="submit">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M17 16l4-4m0 0l-4-4m4 4H7M13 12V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h6a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Log Out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="admin-main">
+        <header class="admin-topbar">
+            <h1><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Admin' %></h1>
+            <div class="admin-topbar__actions">
+                <a href="/" target="_blank" class="abtn abtn--secondary abtn--small">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    View Store
+                </a>
+            </div>
+        </header>
+
+        <div class="admin-content">
+            <% if (typeof successMessages !== 'undefined' && successMessages.length > 0) { %>
+                <% successMessages.forEach(msg => { %>
+                    <div class="admin-flash admin-flash--success">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                        <%= msg %>
+                    </div>
+                <% }) %>
+            <% } %>
+            <% if (typeof errorMessages !== 'undefined' && errorMessages.length > 0) { %>
+                <% errorMessages.forEach(msg => { %>
+                    <div class="admin-flash admin-flash--error">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        <%= msg %>
+                    </div>
+                <% }) %>
+            <% } %>
+
+            <%- body %>
+        </div>
+    </div>
+</div>
+<script src="/js/admin.js"></script>
+</body>
+</html>

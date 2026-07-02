@@ -1,0 +1,83 @@
+<% const pageTitle = activeCategory ? activeCategory.name : (query.search ? `Search: ${query.search}` : 'All Frames') %>
+
+<div class="shop-layout">
+    <aside class="filters">
+        <h3>Filters</h3>
+
+        <div class="filter-group">
+            <h4>Shape / Category</h4>
+            <div class="filter-option">
+                <a href="/products" class="<%= !query.category ? 'is-active' : '' %>">All Frames</a>
+            </div>
+            <% categories.forEach(cat => { %>
+                <div class="filter-option">
+                    <a href="/products?category=<%= cat.slug %><%= query.search ? '&search=' + query.search : '' %>" class="<%= query.category === cat.slug ? 'is-active' : '' %>">
+                        <%= cat.name %>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+
+        <div class="filter-group">
+            <h4>Price Range</h4>
+            <form action="/products" method="GET">
+                <% if (query.category) { %><input type="hidden" name="category" value="<%= query.category %>"><% } %>
+                <% if (query.search) { %><input type="hidden" name="search" value="<%= query.search %>"><% } %>
+                <div class="price-inputs">
+                    <input type="number" name="min" placeholder="Min ₹" value="<%= query.min || '' %>">
+                    <span>—</span>
+                    <input type="number" name="max" placeholder="Max ₹" value="<%= query.max || '' %>">
+                </div>
+                <button type="submit" class="btn btn--small btn--outline btn--full" style="margin-top:12px;">Apply</button>
+            </form>
+        </div>
+    </aside>
+
+    <div class="shop-results">
+        <div class="shop-toolbar">
+            <p class="result-count"><%= totalCount %> frame<%= totalCount !== 1 ? 's' : '' %> found<% if (activeCategory) { %> in <strong><%= activeCategory.name %></strong><% } %></p>
+            <form action="/products" method="GET">
+                <% if (query.category) { %><input type="hidden" name="category" value="<%= query.category %>"><% } %>
+                <% if (query.search) { %><input type="hidden" name="search" value="<%= query.search %>"><% } %>
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="newest" <%= query.sort === 'newest' || !query.sort ? 'selected' : '' %>>Newest First</option>
+                    <option value="price_low" <%= query.sort === 'price_low' ? 'selected' : '' %>>Price: Low to High</option>
+                    <option value="price_high" <%= query.sort === 'price_high' ? 'selected' : '' %>>Price: High to Low</option>
+                    <option value="rating" <%= query.sort === 'rating' ? 'selected' : '' %>>Highest Rated</option>
+                    <option value="popular" <%= query.sort === 'popular' ? 'selected' : '' %>>Most Popular</option>
+                </select>
+            </form>
+        </div>
+
+        <% if (products.length === 0) { %>
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.5"/></svg>
+                <h3>No frames found</h3>
+                <p>Try adjusting your filters or browse all our frames.</p>
+                <br>
+                <a href="/products" class="btn btn--primary">View All Frames</a>
+            </div>
+        <% } else { %>
+            <div class="product-grid">
+                <% products.forEach(product => { %>
+                    <%- include('../partials/product-card', { product }) %>
+                <% }) %>
+            </div>
+
+            <% if (totalPages > 1) { %>
+                <div class="pagination">
+                    <% const qs = (p) => {
+                        const params = new URLSearchParams(query);
+                        params.set('page', p);
+                        return '/products?' + params.toString();
+                    } %>
+                    <% if (currentPage > 1) { %><a href="<%= qs(currentPage - 1) %>">‹</a><% } %>
+                    <% for (let p = 1; p <= totalPages; p++) { %>
+                        <a href="<%= qs(p) %>" class="<%= p === currentPage ? 'is-active' : '' %>"><%= p %></a>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %><a href="<%= qs(currentPage + 1) %>">›</a><% } %>
+                </div>
+            <% } %>
+        <% } %>
+    </div>
+</div>

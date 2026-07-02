@@ -1,0 +1,75 @@
+<% pageTitle = 'Products'; layout = 'admin/layout' %>
+
+<div class="admin-card">
+    <div class="admin-card__head">
+        <div class="admin-toolbar">
+            <form action="/admin/products" method="GET" class="admin-search">
+                <input type="text" name="search" placeholder="Search products…" value="<%= search %>">
+                <button type="submit">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                </button>
+            </form>
+            <span style="font-size:0.82rem; color:var(--admin-ink-soft);"><%= totalCount %> products</span>
+        </div>
+        <a href="/admin/products/new" class="abtn abtn--primary">+ New Product</a>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Featured</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            <% if (products.length === 0) { %>
+                <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--admin-ink-soft);">No products found. <a href="/admin/products/new" style="color:var(--admin-terracotta);">Add one →</a></td></tr>
+            <% } else { %>
+                <% products.forEach(p => { %>
+                    <tr>
+                        <td style="max-width:220px;">
+                            <div style="font-weight:600; font-size:0.88rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= p.name %></div>
+                            <div class="mono" style="font-size:0.72rem; color:var(--admin-ink-soft);"><%= p.sku || '—' %></div>
+                        </td>
+                        <td style="font-size:0.85rem;"><%= p.category_name %></td>
+                        <td class="mono">
+                            <% if (p.discount_price) { %>
+                                <span style="color:var(--admin-terracotta);">₹<%= Number(p.discount_price).toLocaleString('en-IN') %></span>
+                                <span style="text-decoration:line-through; color:var(--admin-ink-soft); font-size:0.78rem;"> ₹<%= Number(p.price).toLocaleString('en-IN') %></span>
+                            <% } else { %>
+                                ₹<%= Number(p.price).toLocaleString('en-IN') %>
+                            <% } %>
+                        </td>
+                        <td>
+                            <span class="mono"<% if (p.stock_quantity <= 5) { %> style="color:var(--admin-terracotta); font-weight:600;"<% } %>><%= p.stock_quantity %></span>
+                            <% if (p.stock_quantity === 0) { %><br><span style="font-size:0.72rem; color:var(--admin-error);">Out of stock</span><% } %>
+                        </td>
+                        <td>
+                            <% if (p.is_featured) { %><span style="color:var(--admin-gold);">★ Yes</span><% } else { %><span style="color:var(--admin-ink-soft);">—</span><% } %>
+                        </td>
+                        <td>
+                            <form action="/admin/products/<%= p.id %>/toggle-active" method="POST" style="display:inline;">
+                                <button type="submit" class="status-pill status-<%= p.is_active ? 'active' : 'inactive' %>" style="border:none; cursor:pointer;">
+                                    <%= p.is_active ? 'Active' : 'Hidden' %>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <a href="/admin/products/<%= p.id %>/edit" class="abtn abtn--secondary abtn--small">Edit</a>
+                                <form action="/admin/products/<%= p.id %>/delete" method="POST" data-confirm="Delete '<%= p.name %>'? This cannot be undone.">
+                                    <button type="submit" class="abtn abtn--danger abtn--small">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+
+    <% if (totalPages > 1) { %>
+        <div class="admin-pagination">
+            <% for (let p = 1; p <= totalPages; p++) { %>
+                <a href="/admin/products?page=<%= p %>&search=<%= search %>" class="<%= p === currentPage ? 'is-active' : '' %>"><%= p %></a>
+            <% } %>
+        </div>
+    <% } %>
+</div>

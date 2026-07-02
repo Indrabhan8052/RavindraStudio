@@ -1,0 +1,182 @@
+<% const pageTitle = 'My Profile' %>
+<div class="profile-page">
+    <!-- Sidebar nav -->
+    <aside class="profile-nav">
+        <div class="profile-avatar">
+            <% if (user.avatar) { %>
+                <img src="<%= user.avatar %>" alt="<%= user.full_name %>">
+            <% } else { %>
+                <div class="placeholder"><%= user.full_name.charAt(0).toUpperCase() %></div>
+            <% } %>
+            <div class="name"><%= user.full_name %></div>
+            <div class="email"><%= user.email %></div>
+        </div>
+        <a href="/profile" class="is-active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Profile
+        </a>
+        <a href="/orders">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9 9h6M9 13h6M9 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            My Orders
+        </a>
+        <a href="/wishlist">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s-7.5-4.873-10-9.5C0.5 7.5 2.5 3 7 3c2.5 0 4 1.5 5 3 1-1.5 2.5-3 5-3 4.5 0 6.5 4.5 5 8.5C19.5 16.127 12 21 12 21z" stroke="currentColor" stroke-width="2"/></svg>
+            Wishlist
+        </a>
+        <a href="/cart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.4 12.4a2 2 0 002 1.6h8.4a2 2 0 002-1.6L21 8H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            My Cart
+        </a>
+        <form action="/logout" method="POST" style="margin-top:8px;">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" style="width:100%; text-align:left; display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:var(--radius-sm); font-size:0.9rem; color:var(--color-error); background:none; border:none;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 16l4-4m0 0l-4-4m4 4H7M13 12V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h6a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Log Out
+            </button>
+        </form>
+    </aside>
+
+    <!-- Main content -->
+    <div>
+        <!-- Personal Info -->
+        <div class="profile-panel">
+            <h2>Personal Information</h2>
+            <p class="subtitle">Update your name, phone and profile photo.</p>
+            <form action="/profile/update" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div style="display:flex; gap:16px; align-items:center; margin-bottom:24px;">
+                    <div style="width:72px; height:72px; border-radius:50%; overflow:hidden; background:var(--color-bg-alt); flex-shrink:0;">
+                        <% if (user.avatar) { %>
+                            <img src="<%= user.avatar %>" alt="" style="width:100%; height:100%; object-fit:cover;">
+                        <% } else { %>
+                            <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--color-terracotta);">
+                                <%= user.full_name.charAt(0).toUpperCase() %>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div>
+                        <label for="avatar" class="btn btn--small btn--outline" style="cursor:pointer;">Change Photo</label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" style="display:none;">
+                        <p style="font-size:0.75rem; color:var(--color-ink-soft); margin-top:6px;">JPG or PNG, max 2MB</p>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="full_name">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" value="<%= user.full_name %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" value="<%= user.phone %>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" value="<%= user.email %>" disabled style="background:var(--color-bg-alt); cursor:not-allowed;">
+                    <span class="hint">Email cannot be changed after registration.</span>
+                </div>
+                <button type="submit" class="btn btn--primary">Save Changes</button>
+            </form>
+        </div>
+
+        <!-- Change Password -->
+        <div class="profile-panel">
+            <h2>Change Password</h2>
+            <p class="subtitle">Choose a strong password with uppercase letters and numbers.</p>
+            <form action="/profile/change-password" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="new_password">New Password</label>
+                        <input type="password" id="new_password" name="new_password" placeholder="Min. 8 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_new_password">Confirm New Password</label>
+                        <input type="password" id="confirm_new_password" name="confirm_new_password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn--primary">Update Password</button>
+            </form>
+        </div>
+
+        <!-- Address Book -->
+        <div class="profile-panel">
+            <h2>Address Book</h2>
+            <p class="subtitle">Manage your saved delivery addresses.</p>
+
+            <% if (addresses.length === 0) { %>
+                <p style="color:var(--color-ink-soft); padding:12px 0;">No addresses saved yet. Add one below.</p>
+            <% } else { %>
+                <% addresses.forEach(addr => { %>
+                    <div class="address-card <%= addr.is_default ? 'is-default' : '' %>">
+                        <% if (addr.is_default) { %><span class="default-tag">Default</span><% } %>
+                        <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; color:var(--color-terracotta); margin-bottom:4px;"><%= addr.label %></div>
+                        <div style="font-weight:600;"><%= addr.full_name %></div>
+                        <div style="font-size:0.88rem; color:var(--color-ink-soft); margin-top:4px;">
+                            <%= addr.address_line1 %><%= addr.address_line2 ? ', ' + addr.address_line2 : '' %>,
+                            <%= addr.city %>, <%= addr.state %> — <%= addr.pincode %><br>
+                            Phone: <%= addr.phone %>
+                        </div>
+                        <div class="address-card__actions">
+                            <form action="/profile/addresses/<%= addr.id %>/delete" method="POST" data-confirm="Remove this address?">
+                                <button type="submit">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+
+            <details style="margin-top:20px;">
+                <summary style="cursor:pointer; font-weight:600; color:var(--color-terracotta);">+ Add New Address</summary>
+                <form action="/profile/addresses" method="POST" style="margin-top:16px; padding:20px; border:1.5px dashed var(--color-border); border-radius:var(--radius-md);">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="hidden" name="redirectTo" value="/profile">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Label</label>
+                            <select name="label">
+                                <option value="Home">Home</option>
+                                <option value="Work">Work</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="full_name" value="<%= user.full_name %>" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" name="phone" value="<%= user.phone %>" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Address Line 1</label>
+                        <input type="text" name="address_line1" placeholder="Flat / House No., Building, Street" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Address Line 2 (optional)</label>
+                        <input type="text" name="address_line2" placeholder="Landmark, Area">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>City</label><input type="text" name="city" required></div>
+                        <div class="form-group"><label>State</label><input type="text" name="state" required></div>
+                        <div class="form-group"><label>Pincode</label><input type="text" name="pincode" maxlength="6" required></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="is_default" name="is_default">
+                            <label for="is_default">Set as default address</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn--primary">Save Address</button>
+                </form>
+            </details>
+        </div>
+    </div>
+</div>

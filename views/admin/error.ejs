@@ -1,0 +1,7 @@
+<% pageTitle = 'Error'; layout = 'admin/layout' %>
+<div style="text-align:center; padding:60px 24px;">
+    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" style="color:var(--admin-error); margin:0 auto 20px;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <h2 style="margin-bottom:8px;">Something went wrong</h2>
+    <p style="color:var(--admin-ink-soft); margin-bottom:24px;"><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
+    <a href="/admin/dashboard" class="abtn abtn--primary">← Back to Dashboard</a>
+</div>

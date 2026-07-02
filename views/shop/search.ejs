@@ -1,0 +1,82 @@
+<% const pageTitle = 'Search: "' + q + '"' %>
+
+<div style="max-width:var(--container-width); margin:0 auto; padding:40px 24px 80px;">
+
+    <!-- Search header -->
+    <div style="margin-bottom:32px;">
+        <form action="/search" method="GET" class="header-search" style="max-width:560px; margin-bottom:16px;">
+            <input type="text" name="q" value="<%= q %>" placeholder="Search frames…" style="font-size:1rem; padding:14px 18px;">
+            <button type="submit" aria-label="Search" style="padding:0 20px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+        </form>
+
+        <p style="color:var(--color-ink-soft);">
+            <% if (total === 0) { %>
+                No results for <strong>"<%= q %>"</strong>
+            <% } else { %>
+                <strong><%= total %></strong> result<%= total !== 1 ? 's' : '' %> for <strong>"<%= q %>"</strong>
+            <% } %>
+        </p>
+    </div>
+
+    <!-- Category suggestions -->
+    <% if (suggestedCategories && suggestedCategories.length > 0) { %>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px;">
+            <span style="font-size:0.82rem; color:var(--color-ink-soft); align-self:center;">Browse shape:</span>
+            <% suggestedCategories.forEach(cat => { %>
+                <a href="/products?category=<%= cat.slug %>" style="display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border:1.5px solid var(--color-border); border-radius:20px; font-size:0.82rem; font-weight:500; color:var(--color-ink-soft);">
+                    <%= cat.name %>
+                </a>
+            <% }) %>
+        </div>
+    <% } %>
+
+    <% if (total === 0) { %>
+        <!-- No results state -->
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <h3>No frames found for "<%= q %>"</h3>
+            <p>Try different keywords like "wooden", "circle", "heart", or "collage".</p>
+            <div style="margin-top:24px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <a href="/products" class="btn btn--primary">Browse All Frames</a>
+                <a href="/products?category=heart-frames" class="btn btn--secondary">Heart Frames</a>
+                <a href="/products?category=circle-frames" class="btn btn--secondary">Circle Frames</a>
+            </div>
+        </div>
+
+    <% } else { %>
+        <!-- Sort toolbar -->
+        <div class="shop-toolbar" style="margin-bottom:24px;">
+            <p class="result-count"><%= total %> frames found</p>
+            <form action="/search" method="GET">
+                <input type="hidden" name="q" value="<%= q %>">
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="relevance" <%= sort === 'relevance' || !sort ? 'selected' : '' %>>Most Relevant</option>
+                    <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest First</option>
+                    <option value="price_low" <%= sort === 'price_low' ? 'selected' : '' %>>Price: Low to High</option>
+                    <option value="price_high" <%= sort === 'price_high' ? 'selected' : '' %>>Price: High to Low</option>
+                    <option value="rating" <%= sort === 'rating' ? 'selected' : '' %>>Highest Rated</option>
+                </select>
+            </form>
+        </div>
+
+        <!-- Product grid -->
+        <div class="product-grid">
+            <% products.forEach(product => { %>
+                <%- include('../partials/product-card', { product }) %>
+            <% }) %>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="pagination">
+                <% if (currentPage > 1) { %><a href="/search?q=<%= encodeURIComponent(q) %>&sort=<%= sort %>&page=<%= currentPage - 1 %>">‹</a><% } %>
+                <% for (let p = 1; p <= totalPages; p++) { %>
+                    <a href="/search?q=<%= encodeURIComponent(q) %>&sort=<%= sort %>&page=<%= p %>" class="<%= p === currentPage ? 'is-active' : '' %>"><%= p %></a>
+                <% } %>
+                <% if (currentPage < totalPages) { %><a href="/search?q=<%= encodeURIComponent(q) %>&sort=<%= sort %>&page=<%= currentPage + 1 %>">›</a><% } %>
+            </div>
+        <% } %>
+    <% } %>
+</div>

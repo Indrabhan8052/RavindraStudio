@@ -1,0 +1,42 @@
+<% pageTitle = 'Contact Messages'; layout = 'admin/layout' %>
+
+<div class="admin-card">
+    <div class="admin-card__head"><h3>Contact Messages</h3></div>
+    <table class="data-table">
+        <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+            <% if (messages.length === 0) { %>
+                <tr><td colspan="6" style="text-align:center; padding:36px; color:var(--admin-ink-soft);">No messages yet.</td></tr>
+            <% } else { %>
+                <% messages.forEach(msg => { %>
+                    <tr<% if (!msg.is_read) { %> style="background: #FFFAF5;"<% } %>>
+                        <td>
+                            <div style="font-weight:600; font-size:0.88rem;"><%= msg.name %></div>
+                            <div style="font-size:0.75rem; color:var(--admin-ink-soft);"><%= msg.email %></div>
+                        </td>
+                        <td style="font-size:0.85rem;"><%= msg.subject || '—' %></td>
+                        <td style="font-size:0.85rem; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--admin-ink-soft);">
+                            <%= msg.message %>
+                        </td>
+                        <td style="font-size:0.78rem; color:var(--admin-ink-soft);"><%= new Date(msg.created_at).toLocaleDateString('en-IN') %></td>
+                        <td>
+                            <% if (!msg.is_read) { %><span class="status-pill status-placed">Unread</span><% } else { %><span style="font-size:0.78rem; color:var(--admin-ink-soft);">Read</span><% } %>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <% if (!msg.is_read) { %>
+                                    <form action="/admin/messages/<%= msg.id %>/read" method="POST">
+                                        <button type="submit" class="abtn abtn--secondary abtn--small">Mark Read</button>
+                                    </form>
+                                <% } %>
+                                <form action="/admin/messages/<%= msg.id %>/delete" method="POST" data-confirm="Delete this message?">
+                                    <button type="submit" class="abtn abtn--danger abtn--small">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+</div>

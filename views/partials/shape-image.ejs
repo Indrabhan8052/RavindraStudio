@@ -1,0 +1,13 @@
+<%
+/*
+  Usage: include this partial with locals { shape, imageUrl, alt }
+  Renders the product photo cropped into the shape of its frame category
+  (square / circle / heart / oval / hexagon / rectangle / polaroid / collage)
+*/
+const shapeClass = 'shape-' + (typeof shape !== 'undefined' && shape ? shape : 'square');
+const safeImg = typeof imageUrl !== 'undefined' && imageUrl ? imageUrl : '/images/placeholder-frame.svg';
+const safeAlt = typeof alt !== 'undefined' ? alt : 'Photo frame';
+%>
+<div class="shape-frame <%= shapeClass %>">
+    <img src="<%= safeImg %>" alt="<%= safeAlt %>" loading="lazy">
+</div>

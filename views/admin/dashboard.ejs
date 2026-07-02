@@ -1,0 +1,121 @@
+<% pageTitle = 'Dashboard'; layout = 'admin/layout' %>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card__label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+            Total Revenue
+        </div>
+        <div class="stat-card__value">₹<%= Number(revenueStats.total_revenue || 0).toLocaleString('en-IN') %></div>
+        <div class="stat-card__sub">All time · excl. cancelled</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M9 9h6M9 13h6M9 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Total Orders
+        </div>
+        <div class="stat-card__value"><%= revenueStats.total_orders || 0 %></div>
+        <div class="stat-card__sub"><%= revenueStats.pending_orders || 0 %> pending action</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M2 20c0-4 3.1-7 7-7s7 3 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Customers
+        </div>
+        <div class="stat-card__value"><%= totalCustomers %></div>
+        <div class="stat-card__sub">Registered accounts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M3 16c0-1.1.9-2 2-2h14a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3z" stroke="currentColor" stroke-width="2"/></svg>
+            Products
+        </div>
+        <div class="stat-card__value"><%= totalProducts %></div>
+        <div class="stat-card__sub"><% if (lowStockCount > 0) { %><span style="color:#B85C38;"><%= lowStockCount %> low stock</span><% } else { %>All items stocked<% } %></div>
+    </div>
+</div>
+
+<div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px;">
+    <!-- Recent Orders -->
+    <div class="admin-card">
+        <div class="admin-card__head">
+            <h3>Recent Orders</h3>
+            <a href="/admin/orders" class="abtn abtn--secondary abtn--small">View All →</a>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <% if (recentOrders.length === 0) { %>
+                    <tr><td colspan="4" style="text-align:center; color:var(--admin-ink-soft); padding:28px;">No orders yet.</td></tr>
+                <% } else { %>
+                    <% recentOrders.forEach(order => { %>
+                        <tr>
+                            <td><a href="/admin/orders/<%= order.id %>" class="mono" style="color:var(--admin-terracotta);">#<%= order.order_number %></a></td>
+                            <td><%= order.customer_name %></td>
+                            <td class="mono">₹<%= Number(order.total_amount).toLocaleString('en-IN') %></td>
+                            <td><span class="status-pill status-<%= order.order_status %>"><%= order.order_status %></span></td>
+                        </tr>
+                    <% }) %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Top Products + Quick links -->
+    <div>
+        <div class="admin-card" style="margin-bottom:24px;">
+            <div class="admin-card__head"><h3>Top Products</h3></div>
+            <table class="data-table">
+                <thead><tr><th>Product</th><th>Sold</th><th>Revenue</th></tr></thead>
+                <tbody>
+                    <% if (topProducts.length === 0) { %>
+                        <tr><td colspan="3" style="text-align:center; color:var(--admin-ink-soft); padding:20px;">No sales data yet.</td></tr>
+                    <% } else { %>
+                        <% topProducts.forEach(p => { %>
+                            <tr>
+                                <td style="font-size:0.82rem; max-width:140px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= p.product_name %></td>
+                                <td class="mono"><%= p.total_sold %></td>
+                                <td class="mono">₹<%= Number(p.total_revenue).toLocaleString('en-IN') %></td>
+                            </tr>
+                        <% }) %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="admin-card">
+            <div class="admin-card__head"><h3>Quick Actions</h3></div>
+            <div class="admin-card__body" style="display:flex; flex-direction:column; gap:10px;">
+                <a href="/admin/products/new" class="abtn abtn--primary">+ Add New Product</a>
+                <a href="/admin/categories/new" class="abtn abtn--secondary">+ Add Category</a>
+                <a href="/admin/orders/verify-payments" class="abtn <%= typeof pendingVerificationCount !== 'undefined' && pendingVerificationCount > 0 ? 'abtn--primary' : 'abtn--secondary' %>">
+                    Verify UPI Payments <%= typeof pendingVerificationCount !== 'undefined' && pendingVerificationCount > 0 ? '(' + pendingVerificationCount + ')' : '' %>
+                </a>
+                <a href="/admin/orders?status=placed" class="abtn abtn--secondary">View Pending Orders <%= revenueStats.pending_orders > 0 ? '(' + revenueStats.pending_orders + ')' : '' %></a>
+                <a href="/admin/messages" class="abtn abtn--secondary">Messages <%= unreadMessages > 0 ? '(' + unreadMessages + ' unread)' : '' %></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Sales (plain table — no chart library needed) -->
+<% if (monthlySales && monthlySales.length > 0) { %>
+<div class="admin-card" style="margin-top:24px;">
+    <div class="admin-card__head"><h3>Monthly Sales (last 6 months)</h3></div>
+    <table class="data-table">
+        <thead><tr><th>Month</th><th>Orders</th><th>Revenue</th></tr></thead>
+        <tbody>
+            <% monthlySales.forEach(row => { %>
+                <tr>
+                    <td><%= row.month %></td>
+                    <td class="mono"><%= row.orders %></td>
+                    <td class="mono">₹<%= Number(row.revenue).toLocaleString('en-IN') %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>
+<% } %>

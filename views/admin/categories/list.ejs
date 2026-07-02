@@ -1,0 +1,41 @@
+<% pageTitle = 'Categories'; layout = 'admin/layout' %>
+
+<div class="admin-card">
+    <div class="admin-card__head">
+        <h3>Frame Shape Categories</h3>
+        <a href="/admin/categories/new" class="abtn abtn--primary">+ New Category</a>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr><th>Name</th><th>Shape Icon</th><th>Products</th><th>Order</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+            <% if (categories.length === 0) { %>
+                <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--admin-ink-soft);">No categories yet.</td></tr>
+            <% } else { %>
+                <% categories.forEach(cat => { %>
+                    <tr>
+                        <td>
+                            <div style="font-weight:600;"><%= cat.name %></div>
+                            <div class="mono" style="font-size:0.72rem; color:var(--admin-ink-soft);"><%= cat.slug %></div>
+                        </td>
+                        <td>
+                            <span class="mono" style="font-size:0.82rem; background:var(--admin-content-bg); padding:3px 9px; border-radius:4px;"><%= cat.icon_shape %></span>
+                        </td>
+                        <td class="mono"><%= cat.product_count || 0 %></td>
+                        <td class="mono"><%= cat.display_order %></td>
+                        <td><span class="status-pill status-<%= cat.is_active ? 'active' : 'inactive' %>"><%= cat.is_active ? 'Active' : 'Hidden' %></span></td>
+                        <td>
+                            <div class="actions">
+                                <a href="/admin/categories/<%= cat.id %>/edit" class="abtn abtn--secondary abtn--small">Edit</a>
+                                <form action="/admin/categories/<%= cat.id %>/delete" method="POST" data-confirm="Delete '<%= cat.name %>'? This will fail if products are linked to it.">
+                                    <button type="submit" class="abtn abtn--danger abtn--small">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+</div>

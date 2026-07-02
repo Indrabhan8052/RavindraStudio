@@ -1,0 +1,29 @@
+# ============================================================
+# FrameKraft .gitignore
+# ============================================================
+
+# --- NEVER commit these ---
+.env
+*.env.local
+*.env.production
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+
+# --- Uploaded files (use Cloudinary in production) ---
+uploads/
+private-uploads/
+
+# --- Windows / Mac junk ---
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# --- Editor folders ---
+.vscode/
+.idea/
+
+# --- Logs ---
+logs/
+*.log

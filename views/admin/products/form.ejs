@@ -1,0 +1,121 @@
+<% pageTitle = product ? 'Edit: ' + product.name : 'New Product'; layout = 'admin/layout' %>
+
+<div style="max-width:860px;">
+    <div style="margin-bottom:20px;">
+        <a href="/admin/products" class="abtn abtn--ghost abtn--small">← Back to Products</a>
+    </div>
+
+    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+        <div class="form-error-list"><ul><% errors.forEach(e => { %><li><%= e.msg %></li><% }) %></ul></div>
+    <% } %>
+
+    <form action="/admin/products/<%= product ? product.id + '/edit' : 'new' %>" method="POST" enctype="multipart/form-data">
+        <div class="admin-form-section">
+            <h3>Basic Information</h3>
+            <div class="aform-group">
+                <label for="name">Product Name *</label>
+                <input type="text" id="name" name="name" value="<%= oldInput.name || '' %>" required placeholder="e.g. Classic Wooden Square Frame">
+            </div>
+            <div class="aform-row">
+                <div class="aform-group">
+                    <label for="category_id">Category / Shape *</label>
+                    <select id="category_id" name="category_id" required>
+                        <option value="">— Select shape —</option>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat.id %>" <%= String(oldInput.category_id) === String(cat.id) ? 'selected' : '' %>><%= cat.name %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="aform-group">
+                    <label for="sku">SKU (optional)</label>
+                    <input type="text" id="sku" name="sku" value="<%= oldInput.sku || '' %>" placeholder="e.g. SQ-WD-001" style="font-family:var(--font-mono);">
+                </div>
+            </div>
+            <div class="aform-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" placeholder="Describe the frame — material, finish, what makes it special…"><%= oldInput.description || '' %></textarea>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Specifications</h3>
+            <div class="aform-row aform-row--3">
+                <div class="aform-group">
+                    <label for="material">Material</label>
+                    <select id="material" name="material">
+                        <% ['Wood','Acrylic','Metal','PVC','MDF'].forEach(m => { %>
+                            <option value="<%= m %>" <%= oldInput.material === m ? 'selected' : '' %>><%= m %></option>
+                        <% }) %>
+                    </select>
+                </div>
+                <div class="aform-group">
+                    <label for="size">Size</label>
+                    <input type="text" id="size" name="size" value="<%= oldInput.size || '' %>" placeholder="e.g. 8x10 inch">
+                </div>
+                <div class="aform-group">
+                    <label for="color">Color / Finish</label>
+                    <input type="text" id="color" name="color" value="<%= oldInput.color || '' %>" placeholder="e.g. Walnut Brown">
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Pricing & Inventory</h3>
+            <div class="aform-row aform-row--3">
+                <div class="aform-group">
+                    <label for="price">Regular Price (₹) *</label>
+                    <input type="number" id="price" name="price" value="<%= oldInput.price || '' %>" step="0.01" min="1" required placeholder="499">
+                </div>
+                <div class="aform-group">
+                    <label for="discount_price">Discounted Price (₹)</label>
+                    <input type="number" id="discount_price" name="discount_price" value="<%= oldInput.discount_price || '' %>" step="0.01" min="0" placeholder="Leave blank for none">
+                </div>
+                <div class="aform-group">
+                    <label for="stock_quantity">Stock Qty *</label>
+                    <input type="number" id="stock_quantity" name="stock_quantity" value="<%= oldInput.stock_quantity || 0 %>" min="0" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Product Images</h3>
+            <% if (product && product.images && product.images.length > 0) { %>
+                <div class="existing-images">
+                    <% product.images.forEach(img => { %>
+                        <div class="existing-image">
+                            <img src="<%= img.image_path %>" alt="">
+                            <form action="/admin/products/<%= product.id %>/images/<%= img.id %>/delete" method="POST">
+                                <button type="submit" class="existing-image__remove" title="Remove image">✕</button>
+                            </form>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+            <label class="image-upload-area" for="images">
+                <input type="file" id="images" name="images" multiple accept="image/*">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="color:var(--admin-ink-soft); margin:0 auto 10px;"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.5"/></svg>
+                <p style="font-size:0.88rem; color:var(--admin-ink-soft);">Click to upload images (max 6, 5MB each)</p>
+                <p style="font-size:0.75rem; color:var(--admin-ink-soft); margin-top:6px;">First uploaded image will be the primary display image</p>
+            </label>
+        </div>
+
+        <div class="admin-form-section">
+            <h3>Visibility</h3>
+            <div style="display:flex; gap:28px;">
+                <div class="admin-toggle">
+                    <input type="checkbox" id="is_featured" name="is_featured" <%= oldInput.is_featured == 1 || oldInput.is_featured === 'on' ? 'checked' : '' %>>
+                    <label for="is_featured">Feature this product on the homepage</label>
+                </div>
+                <div class="admin-toggle">
+                    <input type="checkbox" id="is_active" name="is_active" <%= (product ? oldInput.is_active != 0 : true) ? 'checked' : '' %>>
+                    <label for="is_active">Active (visible on store)</label>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+            <button type="submit" class="abtn abtn--primary"><%= product ? 'Save Changes' : 'Create Product' %></button>
+            <a href="/admin/products" class="abtn abtn--secondary">Cancel</a>
+        </div>
+    </form>
+</div>

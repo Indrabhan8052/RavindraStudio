@@ -1,0 +1,179 @@
+<% pageTitle = 'Order #' + order.order_number; layout = 'admin/layout' %>
+
+<div style="margin-bottom:20px;">
+    <a href="/admin/orders" class="abtn abtn--ghost abtn--small">← Back to Orders</a>
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 340px; gap:24px; align-items:start;">
+    <div>
+        <!-- Order Items -->
+        <div class="admin-card" style="margin-bottom:20px;">
+            <div class="admin-card__head">
+                <h3>Items in this Order</h3>
+                <span class="status-pill status-<%= order.order_status %>"><%= order.order_status %></span>
+            </div>
+            <table class="data-table">
+                <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th></tr></thead>
+                <tbody>
+                    <% items.forEach(item => { %>
+                        <tr>
+                            <td style="max-width:200px;">
+                                <div style="font-weight:600; font-size:0.88rem;"><%= item.product_name %></div>
+                            </td>
+                            <td class="mono">₹<%= Number(item.price).toLocaleString('en-IN') %></td>
+                            <td class="mono"><%= item.quantity %></td>
+                            <td class="mono" style="font-weight:600;">₹<%= Number(item.line_total).toLocaleString('en-IN') %></td>
+                        </tr>
+                    <% }) %>
+                    <tr style="background:var(--admin-content-bg);">
+                        <td colspan="3" style="text-align:right; font-weight:600; padding:12px 14px;">Total</td>
+                        <td class="mono" style="font-weight:700; font-size:1rem;">₹<%= Number(order.total_amount).toLocaleString('en-IN') %></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Status History -->
+        <div class="admin-card">
+            <div class="admin-card__head"><h3>Order Timeline</h3></div>
+            <div style="padding:0 24px;">
+                <% history.forEach(h => { %>
+                    <div style="display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--admin-border); align-items:flex-start;">
+                        <span class="status-pill status-<%= h.status %>" style="flex-shrink:0;"><%= h.status %></span>
+                        <div>
+                            <% if (h.note) { %><div style="font-size:0.88rem;"><%= h.note %></div><% } %>
+                            <div style="font-size:0.78rem; color:var(--admin-ink-soft);">
+                                <%= new Date(h.created_at).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: customer, address, status controls -->
+    <div>
+        <!-- Customer Info -->
+        <div class="admin-card" style="margin-bottom:16px;">
+            <div class="admin-card__head"><h3>Customer</h3></div>
+            <div class="admin-card__body" style="font-size:0.9rem;">
+                <div style="font-weight:600;"><%= customer ? customer.full_name : '—' %></div>
+                <div style="color:var(--admin-ink-soft);"><%= customer ? customer.email : '' %></div>
+                <div style="color:var(--admin-ink-soft);"><%= customer ? customer.phone : '' %></div>
+            </div>
+        </div>
+
+        <!-- Delivery Address -->
+        <% if (address) { %>
+            <div class="admin-card" style="margin-bottom:16px;">
+                <div class="admin-card__head"><h3>Delivery Address</h3></div>
+                <div class="admin-card__body" style="font-size:0.88rem; color:var(--admin-ink-soft); line-height:1.7;">
+                    <strong style="color:var(--admin-ink);"><%= address.full_name %></strong><br>
+                    <%= address.address_line1 %><%= address.address_line2 ? '<br>' + address.address_line2 : '' %>,<br>
+                    <%= address.city %>, <%= address.state %> — <%= address.pincode %><br>
+                    Ph: <%= address.phone %>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Payment Info -->
+        <div class="admin-card" style="margin-bottom:16px;">
+            <div class="admin-card__head"><h3>Payment</h3></div>
+            <div class="admin-card__body">
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.9rem;">
+                    <span style="color:var(--admin-ink-soft);">Method</span>
+                    <span style="font-weight:600;"><%= order.payment_method === 'COD' ? 'Cash on Delivery' : 'UPI' %></span>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.9rem; margin-bottom:16px;">
+                    <span style="color:var(--admin-ink-soft);">Status</span>
+                    <span class="status-pill status-<%= order.payment_status %>">
+                        <%= order.payment_status === 'submitted' ? 'Under Review' : order.payment_status %>
+                    </span>
+                </div>
+
+                <% if (order.payment_method === 'UPI' && order.upi_transaction_id) { %>
+                    <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--admin-border);">
+                        <span style="color:var(--admin-ink-soft);">Transaction ID</span>
+                        <span class="mono" style="font-weight:600;"><%= order.upi_transaction_id %></span>
+                    </div>
+                <% } %>
+
+                <!-- Payment screenshot, if customer uploaded one -->
+                <% if (order.payment_method === 'UPI' && order.payment_proof_image) { %>
+                    <div style="margin-bottom:16px;">
+                        <p style="font-size:0.78rem; color:var(--admin-ink-soft); margin-bottom:8px;">Payment Screenshot</p>
+                        <a href="/secure/payment-proof/<%= order.id %>" target="_blank">
+                            <img src="/secure/payment-proof/<%= order.id %>" alt="Payment proof" style="width:100%; max-width:200px; border-radius:8px; border:1.5px solid var(--admin-border); cursor:zoom-in;">
+                        </a>
+                        <% if (order.payment_proof_submitted_at) { %>
+                            <p style="font-size:0.72rem; color:var(--admin-ink-soft); margin-top:6px;">
+                                Submitted <%= new Date(order.payment_proof_submitted_at).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) %>
+                            </p>
+                        <% } %>
+                    </div>
+                <% } %>
+
+                <% if (order.payment_status === 'rejected' && order.payment_rejection_reason) { %>
+                    <div style="font-size:0.8rem; background:#FBEAE6; color:var(--admin-error); padding:10px 12px; border-radius:7px; margin-bottom:16px;">
+                        <strong>Rejection reason:</strong> <%= order.payment_rejection_reason %>
+                    </div>
+                <% } %>
+
+                <!-- Quick verify/reject buttons when a screenshot is awaiting review -->
+                <% if (order.payment_method === 'UPI' && order.payment_status === 'submitted') { %>
+                    <div style="display:flex; gap:8px; margin-bottom:16px;">
+                        <form action="/admin/orders/<%= order.id %>/verify-payment" method="POST" style="flex:1;">
+                            <input type="hidden" name="redirectTo" value="/admin/orders/<%= order.id %>">
+                            <button type="submit" class="abtn abtn--success abtn--small" style="width:100%;" data-confirm="Confirm payment of ₹<%= Number(order.total_amount).toLocaleString('en-IN') %> was received for this order?">
+                                ✓ Verify & Mark Paid
+                            </button>
+                        </form>
+                        <button type="button" class="abtn abtn--danger abtn--small" onclick="document.getElementById('rejectBox').style.display = document.getElementById('rejectBox').style.display === 'none' ? 'block' : 'none'">
+                            ✕ Reject
+                        </button>
+                    </div>
+                    <div id="rejectBox" style="display:none; margin-bottom:16px;">
+                        <form action="/admin/orders/<%= order.id %>/reject-payment" method="POST">
+                            <input type="hidden" name="redirectTo" value="/admin/orders/<%= order.id %>">
+                            <input type="text" name="reason" placeholder="Reason for rejection" style="width:100%; margin-bottom:8px; font-size:0.82rem;">
+                            <button type="submit" class="abtn abtn--danger abtn--small" style="width:100%;">Confirm Rejection</button>
+                        </form>
+                    </div>
+                <% } %>
+
+                <!-- Manual override (admin can always force-set payment status) -->
+                <form action="/admin/orders/<%= order.id %>/payment-status" method="POST" style="display:flex; gap:8px;">
+                    <select name="payment_status" style="flex:1; font-size:0.82rem; padding:8px 10px;">
+                        <% ['pending','submitted','paid','rejected','failed'].forEach(s => { %>
+                            <option value="<%= s %>" <%= order.payment_status === s ? 'selected' : '' %>><%= s.charAt(0).toUpperCase() + s.slice(1) %></option>
+                        <% }) %>
+                    </select>
+                    <button type="submit" class="abtn abtn--secondary abtn--small">Update</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Update Order Status -->
+        <div class="admin-card">
+            <div class="admin-card__head"><h3>Update Status</h3></div>
+            <div class="admin-card__body">
+                <form action="/admin/orders/<%= order.id %>/status" method="POST">
+                    <div class="aform-group">
+                        <label>New Status</label>
+                        <select name="status">
+                            <% ['placed','confirmed','packed','shipped','delivered','cancelled'].forEach(s => { %>
+                                <option value="<%= s %>" <%= order.order_status === s ? 'selected' : '' %>><%= s.charAt(0).toUpperCase() + s.slice(1) %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="aform-group">
+                        <label>Note (optional)</label>
+                        <input type="text" name="note" placeholder="e.g. Dispatched via DTDC, tracking #123">
+                    </div>
+                    <button type="submit" class="abtn abtn--primary" style="width:100%;">Save Status</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
