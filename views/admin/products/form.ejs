@@ -44,7 +44,7 @@
                 <div class="aform-group">
                     <label for="material">Material</label>
                     <select id="material" name="material">
-                        <% ['Wood','Acrylic','Metal','PVC','MDF'].forEach(m => { %>
+                        <% ['Wood','Plastic','Acrylic','Metal','PVC','MDF'].forEach(m => { %>
                             <option value="<%= m %>" <%= oldInput.material === m ? 'selected' : '' %>><%= m %></option>
                         <% }) %>
                     </select>
