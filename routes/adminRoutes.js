@@ -14,6 +14,7 @@ const adminSettingsController = require('../controllers/admin/settingsController
 
 const { uploadProductImages, uploadCategoryImage, uploadSettingsImage } = require('../middleware/upload');
 const { productValidationRules, categoryValidationRules } = require('../middleware/validators');
+const csrfProtection = require('../middleware/csrf');
 
 // ---------- Admin Auth (separate login page) ----------
 router.get('/login', isGuest, authController.showAdminLogin);
@@ -41,21 +42,50 @@ router.use(async (req, res, next) => {
 router.get('/dashboard', dashboardController.index);
 
 // ---------- Products ----------
+// uploadProductImages (multer) MUST run before csrfProtection.
+// These forms use multipart/form-data (file inputs for product images),
+// so only multer can parse req.body and expose the _csrf field.
 router.get('/products', adminProductController.list);
 router.get('/products/new', adminProductController.showCreateForm);
-router.post('/products/new', uploadProductImages.array('images', 6), productValidationRules, adminProductController.create);
+router.post(
+    '/products/new',
+    uploadProductImages.array('images', 6),
+    csrfProtection,
+    productValidationRules,
+    adminProductController.create
+);
 router.get('/products/:id/edit', adminProductController.showEditForm);
-router.post('/products/:id/edit', uploadProductImages.array('images', 6), productValidationRules, adminProductController.update);
+router.post(
+    '/products/:id/edit',
+    uploadProductImages.array('images', 6),
+    csrfProtection,
+    productValidationRules,
+    adminProductController.update
+);
 router.post('/products/:id/delete', adminProductController.delete);
 router.post('/products/:id/toggle-active', adminProductController.toggleActive);
 router.post('/products/:id/images/:imageId/delete', adminProductController.deleteImage);
 
 // ---------- Categories ----------
+// Same multipart issue as products — uploadCategoryImage (multer) must run
+// before csrfProtection so req.body._csrf is actually populated.
 router.get('/categories', adminCategoryController.list);
 router.get('/categories/new', adminCategoryController.showCreateForm);
-router.post('/categories/new', uploadCategoryImage.single('image'), categoryValidationRules, adminCategoryController.create);
+router.post(
+    '/categories/new',
+    uploadCategoryImage.single('image'),
+    csrfProtection,
+    categoryValidationRules,
+    adminCategoryController.create
+);
 router.get('/categories/:id/edit', adminCategoryController.showEditForm);
-router.post('/categories/:id/edit', uploadCategoryImage.single('image'), categoryValidationRules, adminCategoryController.update);
+router.post(
+    '/categories/:id/edit',
+    uploadCategoryImage.single('image'),
+    csrfProtection,
+    categoryValidationRules,
+    adminCategoryController.update
+);
 router.post('/categories/:id/delete', adminCategoryController.delete);
 
 // ---------- Orders ----------
@@ -78,8 +108,14 @@ router.post('/coupons/:id/toggle-active', adminCouponController.toggleActive);
 router.post('/coupons/:id/delete', adminCouponController.delete);
 
 // ---------- Settings ----------
+// uploadSettingsImage (multer) handles the UPI QR upload — same fix applies.
 router.get('/settings', adminSettingsController.show);
-router.post('/settings', uploadSettingsImage.single('upi_qr_upload'), adminSettingsController.update);
+router.post(
+    '/settings',
+    uploadSettingsImage.single('upi_qr_upload'),
+    csrfProtection,
+    adminSettingsController.update
+);
 
 // ---------- Contact Messages ----------
 router.get('/messages', adminSettingsController.messages);

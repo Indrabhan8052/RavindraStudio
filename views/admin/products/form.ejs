@@ -10,6 +10,7 @@
     <% } %>
 
     <form action="/admin/products/<%= product ? product.id + '/edit' : 'new' %>" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="admin-form-section">
             <h3>Basic Information</h3>
             <div class="aform-group">

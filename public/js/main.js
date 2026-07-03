@@ -1,7 +1,28 @@
 // public/js/main.js
 // Lightweight vanilla JS for storefront interactivity — no framework needed.
 
+// ── CSRF auto-injection ──────────────────────────────────────────────────────
+// window.CSRF_TOKEN is set on every page (see views/partials/csrf-meta.ejs),
+// but nothing was reading it — so most storefront POST forms (cart update/
+// remove, wishlist remove, cancel order, payment-proof upload, profile
+// update, etc.) were missing the hidden _csrf field the server requires.
+// This adds it to any POST form that doesn't already have one.
+function injectCsrfTokenIntoForms(root = document) {
+    if (!window.CSRF_TOKEN) return;
+    root.querySelectorAll('form').forEach(form => {
+        const method = (form.getAttribute('method') || 'GET').toUpperCase();
+        if (method !== 'POST') return;
+        if (form.querySelector('input[name="_csrf"]')) return; // already has one
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = '_csrf';
+        input.value = window.CSRF_TOKEN;
+        form.prepend(input);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    injectCsrfTokenIntoForms();
     autoDismissFlashMessages();
     initQuantitySteppers();
     initPasswordStrength();
@@ -95,6 +116,7 @@ function initStarRatingInput() {
 // ---------- Confirm before destructive actions (delete product, cancel order, etc.) ----------
 document.addEventListener('submit', (e) => {
     const form = e.target;
+    injectCsrfTokenIntoForms(form.parentNode || document); // safety net for dynamic forms
     if (form.matches('[data-confirm]')) {
         const message = form.getAttribute('data-confirm') || 'Are you sure?';
         if (!confirm(message)) {

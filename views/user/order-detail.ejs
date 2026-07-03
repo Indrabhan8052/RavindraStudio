@@ -110,6 +110,7 @@
                     <% } %>
 
                     <form action="/orders/<%= order.id %>/payment-proof" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="form-group">
                             <label for="payment_screenshot">Upload Payment Screenshot *</label>
                             <input type="file" id="payment_screenshot" name="payment_screenshot" accept="image/*" required>
@@ -137,6 +138,7 @@
                         <p style="text-align:center; font-family:var(--font-mono); font-weight:700; color:var(--color-terracotta); margin-bottom:16px;"><%= upiId %></p>
                     <% } %>
                     <form action="/orders/<%= order.id %>/payment-proof" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="form-group">
                             <label for="payment_screenshot2">Re-upload Payment Screenshot *</label>
                             <input type="file" id="payment_screenshot2" name="payment_screenshot" accept="image/*" required>
