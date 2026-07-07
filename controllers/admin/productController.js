@@ -3,6 +3,13 @@ const Product = require('../../models/Product');
 const Category = require('../../models/Category');
 const fs = require('fs');
 const path = require('path');
+const { isProduction } = require('../../config/cloudinary');
+
+// multer-storage-cloudinary sets file.path to the Cloudinary secure_url.
+// The local diskStorage sets file.path to an absolute filesystem path,
+// which isn't a usable public URL — for that backend we need the
+// express.static-served relative path instead.
+const getImageUrl = (file) => isProduction ? file.path : `/uploads/products/${file.filename}`;
 
 const adminProductController = {
     async list(req, res) {
@@ -53,7 +60,7 @@ const adminProductController = {
             // Handle uploaded images
             if (req.files && req.files.length > 0) {
                 for (let i = 0; i < req.files.length; i++) {
-                    const imagePath = `/uploads/products/${req.files[i].filename}`;
+                    const imagePath = getImageUrl(req.files[i]);
                     await Product.addImage(productId, imagePath, i === 0);
                 }
             }
@@ -102,7 +109,7 @@ const adminProductController = {
 
             if (req.files && req.files.length > 0) {
                 for (let i = 0; i < req.files.length; i++) {
-                    const imagePath = `/uploads/products/${req.files[i].filename}`;
+                    const imagePath = getImageUrl(req.files[i]);
                     await Product.addImage(productId, imagePath, false);
                 }
             }
