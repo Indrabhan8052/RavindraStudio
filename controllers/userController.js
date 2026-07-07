@@ -2,6 +2,9 @@
 const User = require('../models/User');
 const Address = require('../models/Address');
 const bcrypt = require('bcryptjs');
+const { isProduction } = require('../config/cloudinary');
+
+const getAvatarUrl = (file) => isProduction ? file.path : `/uploads/avatars/${file.filename}`;
 
 const userController = {
     async showProfile(req, res) {
@@ -18,7 +21,7 @@ const userController = {
     async updateProfile(req, res) {
         try {
             const { full_name, phone } = req.body;
-            const avatar = req.file ? `/uploads/avatars/${req.file.filename}` : undefined;
+            const avatar = req.file ? getAvatarUrl(req.file) : undefined;
 
             await User.updateProfile(req.session.user.id, { full_name, phone, avatar });
 
