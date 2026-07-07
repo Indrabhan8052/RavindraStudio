@@ -2,6 +2,9 @@
 const Settings = require('../../models/Settings');
 const Contact = require('../../models/Contact');
 const Review = require('../../models/Review');
+const { isProduction } = require('../../config/cloudinary');
+
+const getImageUrl = (file) => isProduction ? file.path : `/uploads/settings/${file.filename}`;
 
 const adminSettingsController = {
     async show(req, res) {
@@ -20,7 +23,7 @@ const adminSettingsController = {
 
             // If admin uploaded a new UPI QR code image, save its path too
             if (req.file) {
-                await Settings.set('upi_qr_image', `/uploads/settings/${req.file.filename}`);
+                await Settings.set('upi_qr_image', getImageUrl(req.file));
             }
 
             req.flash('success', 'Settings updated successfully.');
