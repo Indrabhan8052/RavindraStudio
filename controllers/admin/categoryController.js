@@ -1,6 +1,12 @@
 // controllers/admin/categoryController.js
 const Category = require('../../models/Category');
 const { validationResult } = require('express-validator');
+const { isProduction } = require('../../config/cloudinary');
+
+// Same fix as productController: multer-storage-cloudinary puts the real
+// secure_url in file.path; local diskStorage's file.path is a filesystem
+// path, not a public URL, so that branch needs the /uploads/... form instead.
+const getImageUrl = (file) => isProduction ? file.path : `/uploads/categories/${file.filename}`;
 
 const adminCategoryController = {
     async list(req, res) {
@@ -24,7 +30,7 @@ const adminCategoryController = {
                 return res.status(422).render('admin/categories/form', { category: null, errors: errors.array(), oldInput: req.body });
             }
 
-            const image = req.file ? `/uploads/categories/${req.file.filename}` : null;
+            const image = req.file ? getImageUrl(req.file) : null;
             await Category.create({ ...req.body, image });
 
             req.flash('success', 'Category created successfully.');
@@ -59,7 +65,7 @@ const adminCategoryController = {
             }
 
             const data = { ...req.body, is_active: req.body.is_active === 'on' || req.body.is_active === 'true' ? 1 : 0 };
-            if (req.file) data.image = `/uploads/categories/${req.file.filename}`;
+            if (req.file) data.image = getImageUrl(req.file);
 
             await Category.update(req.params.id, data);
             req.flash('success', 'Category updated successfully.');
