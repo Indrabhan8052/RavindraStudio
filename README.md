@@ -1,4 +1,4 @@
-# 🖼️ FrameKraft — Personal Photo Frame E-Commerce Store
+# 🖼️ RavindraStudio — Personal Photo Frame E-Commerce Store
 
 A full-featured personal online store for selling photo frames, built with **Node.js + Express + MySQL + EJS**.  
 Flipkart/Meesho style storefront with a full admin panel — built to run locally on XAMPP.
