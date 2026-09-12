@@ -2,7 +2,7 @@
 const User = require('../../models/User');
 const Address = require('../../models/Address');
 const bcrypt = require('bcryptjs');
-const { isProduction } = require('../config/cloudinary');
+const { isProduction } = require('../../config/cloudinary');
 
 const getAvatarUrl = (file) => isProduction ? file.path : `/uploads/avatars/${file.filename}`;
 
